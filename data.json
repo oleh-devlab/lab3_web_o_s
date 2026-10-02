@@ -1,0 +1,56 @@
+{
+  "currency": "UAH",
+  "categories": [
+    {
+      "name": "Перші страви",
+      "dishes": [
+        {
+          "name": "Борщ український з пампушками",
+          "price": 185.50,
+          "weight": 350,
+          "isSpicy": false,
+          "isVegetarian": false,
+          "description": "Насичений червоний борщ на свинячих реберцях. Подається зі сметаною та часниковими пампушками.",
+          "ingredients": [
+            "Свинячі реберця",
+            "Буряк",
+            "Капуста",
+            "Картопля",
+            "Морква",
+            "Томатна паста"
+          ]
+        },
+        {
+          "name": "Гострий тайський суп Том Ям",
+          "price": 320,
+          "weight": 400,
+          "isSpicy": true,
+          "isVegetarian": false,
+          "description": null,
+          "ingredients": [
+            "Курячий бульйон",
+            "Креветки",
+            "Паста Том Ям",
+            "Кокосове молоко",
+            "Чилі",
+            "Кінза"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Салати",
+      "dishes": [
+        {
+          "name": "Овочевий салат з тофу",
+          "price": 210,
+          "weight": 250,
+          "isSpicy": false,
+          "isVegetarian": true,
+          "description": "Свіжий салат із сезонних овочів.",
+          "ingredients": null
+        }
+      ]
+    }
+  ]
+}
