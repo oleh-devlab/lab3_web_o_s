@@ -1,0 +1,25 @@
+{
+  "name": "lab3_web_o_s",
+  "version": "1.0.0",
+  "description": "Програма для роботи з JSON меню ресторану",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oleh-devlab/lab3_web_o_s.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/oleh-devlab/lab3_web_o_s/issues"
+  },
+  "homepage": "https://github.com/oleh-devlab/lab3_web_o_s#readme",
+  "dependencies": {
+    "commander": "^15.0.0"
+  }
+}
