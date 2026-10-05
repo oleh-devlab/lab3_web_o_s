@@ -25,10 +25,23 @@ function loadData() {
     if (err instanceof SyntaxError) program.error(`Файл "${file}" містить некоректний JSON`);
     program.error(`Не вдалося прочитати "${file}": ${err.message}`);
   }
-  if (!Array.isArray(data.categories)) {
+  if (!Array.isArray(data?.categories)) {
     program.error(`Файл "${file}" не містить масиву categories`);
   }
+  for (const category of data.categories) {
+    if (!Array.isArray(category?.dishes)) {
+      program.error(`Файл "${file}" містить категорію без масиву dishes`);
+    }
+  }
   return data;
+}
+
+function printDish(dish, data, options) {
+  let desc = '';
+  if (options.dishDescriptions && dish.description != null) {
+    desc = `: ${dish.description}`;
+  }
+  console.log(`- ${dish.name} (${dish.price} ${data.currency})${desc}`);
 }
 
 // Шукає страву за ID (номер зі списку `list -i`) або за назвою.
@@ -104,6 +117,22 @@ program.command('get')
       console.log(JSON.stringify(value, null, 2));
     } else {
       console.log(value);
+    }
+  });
+
+program.command('category')
+  .description('показати страви однієї категорії')
+  .argument('<name>', 'назва категорії')
+  .option('-d, --dish-descriptions', 'показувати опис страв')
+  .action((name, options) => {
+    const data = loadData();
+    const category = data.categories.find((c) => c.name.toLowerCase() === name.toLowerCase());
+    if (category === undefined) program.error(`Категорію "${name}" не знайдено`);
+
+    console.log(`${category.name}:`);
+    if (category.dishes.length === 0) console.log('- Категорія не має страв');
+    for (const dish of category.dishes) {
+      printDish(dish, data, options);
     }
   });
 
