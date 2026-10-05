@@ -44,6 +44,14 @@ function printDish(dish, data, options) {
   console.log(`- ${dish.name} (${dish.price} ${data.currency})${desc}`);
 }
 
+function parsePrice(value) {
+  const n = Number(value);
+  if (value.trim() === '' || Number.isNaN(n) || n < 0) {
+    throw new InvalidArgumentError('Очікується невід\'ємне число.');
+  }
+  return n;
+}
+
 // Шукає страву за ID (номер зі списку `list -i`) або за назвою.
 function findDish(data, key) {
   let i = 0;
@@ -134,6 +142,27 @@ program.command('category')
     for (const dish of category.dishes) {
       printDish(dish, data, options);
     }
+  });
+
+program.command('filter')
+  .description('відібрати страви за позначками та граничною ціною')
+  .option('-s, --spicy', 'лише гострі страви')
+  .option('-v, --vegetarian', 'лише вегетаріанські страви')
+  .option('-p, --max-price <number>', 'найвища допустима ціна', parsePrice)
+  .option('-d, --dish-descriptions', 'показувати опис страв')
+  .action((options) => {
+    const data = loadData();
+    let found = 0;
+    for (const category of data.categories) {
+      for (const dish of category.dishes) {
+        if (options.spicy && dish.isSpicy !== true) continue;
+        if (options.vegetarian && dish.isVegetarian !== true) continue;
+        if (options.maxPrice !== undefined && dish.price > options.maxPrice) continue;
+        printDish(dish, data, options);
+        found++;
+      }
+    }
+    if (found === 0) console.log('Страв за такими умовами не знайдено');
   });
 
 program.parse();
