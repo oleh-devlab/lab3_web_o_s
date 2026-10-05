@@ -165,4 +165,28 @@ program.command('filter')
     if (found === 0) console.log('Страв за такими умовами не знайдено');
   });
 
+program.command('search')
+  .description('знайти страви, що містять інгредієнт')
+  .argument('<ingredient>', 'назва інгредієнта або її частина')
+  .option('-e, --exact', 'шукати лише точний збіг назви')
+  .option('-d, --dish-descriptions', 'показувати опис страв')
+  .action((ingredient, options) => {
+    const data = loadData();
+    const wanted = ingredient.toLowerCase();
+    let found = 0;
+    for (const category of data.categories) {
+      for (const dish of category.dishes) {
+        const ingredients = dish.ingredients ?? [];
+        const matches = ingredients.some((item) => {
+          const name = item.toLowerCase();
+          return options.exact ? name === wanted : name.includes(wanted);
+        });
+        if (!matches) continue;
+        printDish(dish, data, options);
+        found++;
+      }
+    }
+    if (found === 0) console.log(`Страв з інгредієнтом "${ingredient}" не знайдено`);
+  });
+
 program.parse();
