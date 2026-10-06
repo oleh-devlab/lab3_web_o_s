@@ -44,6 +44,16 @@ function printDish(dish, data, options) {
   console.log(`- ${dish.name} (${dish.price} ${data.currency})${desc}`);
 }
 
+function printDishFull(dish, data) {
+  console.log(`Назва: ${dish.name}`);
+  console.log(`Ціна: ${dish.price} ${data.currency}`);
+  console.log(`Вага: ${dish.weight} г`);
+  console.log(`Гостра: ${dish.isSpicy ? 'так' : 'ні'}`);
+  console.log(`Вегетаріанська: ${dish.isVegetarian ? 'так' : 'ні'}`);
+  console.log(`Опис: ${dish.description ?? 'немає'}`);
+  console.log(`Інгредієнти: ${dish.ingredients ? dish.ingredients.join(', ') : 'не вказано'}`);
+}
+
 function parsePrice(value) {
   const n = Number(value);
   if (value.trim() === '' || Number.isNaN(n) || n < 0) {
@@ -102,7 +112,7 @@ program.command('show')
   .action((dishKey) => {
     const data = loadData();
     const dish = findDish(data, dishKey);
-    console.log(JSON.stringify(dish, null, 2));
+    printDishFull(dish, data);
   });
 
 program.command('get')
