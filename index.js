@@ -4,7 +4,9 @@ import { readFileSync } from 'node:fs';
 program
   .name('menu')
   .description('Перегляд інформації про меню')
-  .version('1.0.0', '-V, --version', 'поглянути версію')
+  .version('1.0.0', '-V, --version', 'показати версію')
+  .helpOption('-h, --help', 'показати довідку')
+  .helpCommand('help [command]', 'показати довідку для команди')
   .option('-f, --file <path>', 'шлях до JSON-файлу', 'data.json');
 
 function parsePositiveInt(value) {
@@ -37,7 +39,7 @@ function loadData() {
 }
 
 function printDish(dish, data, options, id) {
-const prefix = options.showId ? `[${id}]` : '-';
+  const prefix = options.showId ? `[${id}]` : '-';
   let desc = '';
   if (options.dishDescriptions && dish.description != null) {
     desc = `: ${dish.description}`;
