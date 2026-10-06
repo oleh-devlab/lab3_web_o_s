@@ -36,12 +36,13 @@ function loadData() {
   return data;
 }
 
-function printDish(dish, data, options) {
+function printDish(dish, data, options, id) {
+const prefix = options.showId ? `[${id}]` : '-';
   let desc = '';
   if (options.dishDescriptions && dish.description != null) {
     desc = `: ${dish.description}`;
   }
-  console.log(`- ${dish.name} (${dish.price} ${data.currency})${desc}`);
+  console.log(`${prefix} ${dish.name} (${dish.price} ${data.currency})${desc}`);
 }
 
 function printDishFull(dish, data) {
@@ -67,43 +68,56 @@ function findDish(data, key) {
   let i = 0;
   for (const category of data.categories) {
     for (const dish of category.dishes) {
-      if (String(i) === key || dish.name === key) return dish;
       i++;
+      if (String(i) === key || dish.name === key) return dish;
     }
   }
   program.error(`Страву "${key}" не знайдено`);
 }
 
 program.command('list')
-  .description('показати усі страви')
+  .description('показати усі страви, за потреби з відбором за позначками й ціною')
   .option('-l, --limit <int>', 'обмежити кількість страв для виведення', parsePositiveInt)
   .option('-d, --dish-descriptions', 'показувати опис страв')
   .option('-i, --show-id', 'показувати ID страв')
   .option('--no-categories', 'не показувати категорії страв')
+  .option('-s, --spicy', 'лише гострі страви')
+  .option('-v, --vegetarian', 'лише вегетаріанські страви')
+  .option('-p, --max-price <number>', 'найвища допустима ціна', parsePrice)
   .action((options) => {
     const data = loadData();
-    let i = 0;
-    outerLoop: for (const category of data.categories) {
-      if (options.categories) {
+    let i = 0; // Кількість виведених страв для ліміту
+    let id = 0; // Загальна кількість страв для індексування
+    const isFilter = (options.spicy || options.vegetarian || (options.maxPrice !== undefined)); // Чи задано хоч одну умову фільтрування
+
+    outerLoop:
+    for (const category of data.categories) {
+      let headerPrinted = false; // чи вже виведено заголовок цієї категорії
+      if (options.categories && !isFilter && category.dishes.length === 0) {
         console.log(`${category.name}:`);
-        if (category.dishes.length === 0) console.log('- Категорія не має страв');
+        console.log('- Категорія не має страв');
       }
       for (const dish of category.dishes) {
-        let desc = '';
-        let tid = '-';
-        if (options.dishDescriptions && dish.description != null) {
-          desc = `: ${dish.description}`;
-        }
-        if (options.showId) {
-          tid = `[${i}]`;
+        id++;
+        
+        if (options.spicy && dish.isSpicy !== true) continue;
+        if (options.vegetarian && dish.isVegetarian !== true) continue;
+        if (options.maxPrice !== undefined && dish.price > options.maxPrice) continue;
+        
+        // заголовок друкується лише перед першою стравою, що пройшла фільтр
+        if (options.categories && !headerPrinted) {
+          console.log(`${category.name}:`);
+          headerPrinted = true;
         }
 
-        console.log(`${tid} ${dish.name} (${dish.price} ${data.currency})${desc}`);
+        printDish(dish, data, options, id);
 
         i++;
         if (i === options.limit) break outerLoop;
       }
     }
+    
+    if (i === 0 && isFilter) console.log('Страв за заданими умовами не знайдено');
   });
 
 program.command('show')
@@ -152,27 +166,6 @@ program.command('category')
     for (const dish of category.dishes) {
       printDish(dish, data, options);
     }
-  });
-
-program.command('filter')
-  .description('відібрати страви за позначками та граничною ціною')
-  .option('-s, --spicy', 'лише гострі страви')
-  .option('-v, --vegetarian', 'лише вегетаріанські страви')
-  .option('-p, --max-price <number>', 'найвища допустима ціна', parsePrice)
-  .option('-d, --dish-descriptions', 'показувати опис страв')
-  .action((options) => {
-    const data = loadData();
-    let found = 0;
-    for (const category of data.categories) {
-      for (const dish of category.dishes) {
-        if (options.spicy && dish.isSpicy !== true) continue;
-        if (options.vegetarian && dish.isVegetarian !== true) continue;
-        if (options.maxPrice !== undefined && dish.price > options.maxPrice) continue;
-        printDish(dish, data, options);
-        found++;
-      }
-    }
-    if (found === 0) console.log('Страв за такими умовами не знайдено');
   });
 
 program.command('search')
